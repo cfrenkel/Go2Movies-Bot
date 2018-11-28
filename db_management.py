@@ -3,6 +3,7 @@ import pymongo.mongo_client
 
 
 class DBManagement:
+
     def __init__(self):
         self.client = pymongo.mongo_client.MongoClient()
         self.db = self.client.get_database(settings.db)
@@ -25,8 +26,13 @@ class DBManagement:
     def delete_all_movies(self, chat_id):
         self.collection.update_one({"chat_id": chat_id}, {"$set": {"movies_list": []}})
 
-    def insert_chosen_movie(self, chat_id):
-        pass
+    def insert_chosen_movie(self, chat_id, movie):
+        self.collection.update_one({'chat_id': chat_id, },
+                                   {"$set": {"movie": {'name': movie['name'],
+                                                       'place': movie['place'],
+                                                       'time': movie['time'],
+                                                       'trailer': movie['trailer'],
+                                                       'image': movie['image']}}})
 
     def get_all_movies(self, chat_id):
         return self.collection.find_one({}, {"chat_id": chat_id})["movies_list"]
@@ -38,7 +44,9 @@ class DBManagement:
         return self.collection.find_one({},{"chat_id":chat_id})["date"]
 
     def insert_date(self, chat_id, date, is_notification=True):
-        pass
+        self.collection.update_one({'chat_id': chat_id, },
+                                   {'date': date,
+                                    'is_notification': is_notification})
 
     def find_user(self, chat_id):
         if self.collection.find({},{"chat_id":chat_id}):
