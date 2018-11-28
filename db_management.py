@@ -4,8 +4,9 @@ import pymongo.mongo_client
 
 class db_management:
     def __init__(self):
-        self.db = settings.db
-        self.collection = settings.collection
+        self.client = pymongo.mongo_client.MongoClient()
+        self.db = self.client.get_database(settings.db)
+        self.collection = self.db.get_collection(settings.collection)
 
 
 
