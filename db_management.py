@@ -2,7 +2,7 @@ import settings
 import pymongo.mongo_client
 
 
-class db_management:
+class DBManagement:
     def __init__(self):
         self.client = pymongo.mongo_client.MongoClient()
         self.db = self.client.get_database(settings.db)
