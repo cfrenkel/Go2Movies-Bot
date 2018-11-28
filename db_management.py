@@ -1,9 +1,13 @@
 import settings
+import pymongo.mongo_client
+
 
 class db_management:
     def __init__(self):
         self.db = settings.db
         self.collection = settings.collection
+
+
 
     def init_user(self, chat_id, status):
         pass
