@@ -23,6 +23,19 @@ class db_management:
     def insert_chosen_movie(self, chat_id):
         pass
 
+    def get_all_movies(self, chat_id):
+        pass
+
+    def get_chosen_movie(self, chat_id):
+        pass
+
+    def get_date(self, chat_id):
+        pass
+
     def insert_date(self, chat_id, is_notification=True):
         pass
+
+
+
+
 
