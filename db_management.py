@@ -8,7 +8,8 @@ class DBManagement:
         self.db = self.client.get_database(settings.db)
         self.collection = self.db.get_collection(settings.collection)
 
-    def init_user(self, chat_id, status):
+
+    def insert_user(self, chat_id, status):
         pass
 
     def update_status(self, chat_id):
@@ -40,6 +41,7 @@ class DBManagement:
 
     def find_user(self, chat_id):
         pass
+
 
 
 
