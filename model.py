@@ -126,7 +126,3 @@ def get_film_details( movie_id):
 def notify( chat_id, time_before=60):
     pass
 
-
-# print(m.get_cinemas_nearby(5, 40.692532, -73.990997))
-# print(m.get_cinema_show_times(7334, str(datetime.datetime.now())[:10]))
-print(get_recommended_movies(40.692532, -73.990997, str(datetime.datetime.now())[:10]))
