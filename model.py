@@ -12,6 +12,8 @@ class Model:
     def add_user(self, chat_id):
         if not DB.find_user(chat_id):
             DB.insert_user(chat_id)
+            return True
+        return False
 
     def add_movie(self, chat_id, movie_name):
         querystring = {"query": movie_name.replace(" ", "+"),"n": 1}
@@ -24,26 +26,32 @@ class Model:
             c['director_id'] for c in movie["directors"]]}
         DB.DBManagement.insert_movie(chat_id, movie_det)
 
-
-
-
-        #DB.insert_movie(chat_id, movie_name)
-
     def get_recommended_movies(self, chat_id,lat,lon,date):
-        cinemas = self.get_cinemas_nearby(5, lat,lon)
+        cinemas = self.get_cinemas_nearby(3, lat,lon)
         films = []
         movies = []
         for cinema in cinemas:
-            films.append({"cinema_id":cinema['cinema_id'], "films":self.get_cinema_show_times(cinema['cinema_id'], date)})
+            films.append({"cinema":cinema, "films":self.get_cinema_show_times(cinema['cinema_id'], date)})
 
         for film in films:
-            for f in film:
+            for f in film["films"]:
                 movie_det = self.get_film_details(f['film_id'])
-                movies.append({"cinema_id":film['cinema_id'], "ganer":movie_det['genres'][0]['genre_id'], "cast":[c['cast_id']for c in movie_det["cast"]],"directors": [c['director_id']for c in movie_det["directors"]]})
+                trailer = movie_det['trailers']['med'][0]['film_trailer']
+                image = movie_det['images']['poster']['1']['medium']['film_image']
+                movies.append({"cinema":film['cinema'], "ganer":movie_det['genres'][0]['genre_id'], "cast":[c['cast_id']for c in movie_det["cast"]],"directors": [c['director_id']for c in movie_det["directors"]],"trailers":trailer ,"images":image})
 
+        recommend = []
         my_movies = self.get_all_movies(chat_id)
         for my_movie in my_movies:
-            pass
+            for movie in movies:
+                if my_movie['ganer'] ==  movie['ganer'] or set(my_movie['cast'])^set(movie['cast']) or set(my_movie['directors'])^set(movie['directors']):
+                    recommend.append(movies)
+
+        return movies
+
+
+
+
 
 
 
