@@ -1,14 +1,14 @@
 import settings
+import secret_settings
 import pymongo.mongo_client
 
 
 class DBManagement:
+
     def __init__(self):
         self.client = pymongo.mongo_client.MongoClient()
         self.db = self.client.get_database(settings.db)
         self.collection = self.db.get_collection(settings.collection)
-
-
 
     def init_user(self, chat_id, status):
         pass
