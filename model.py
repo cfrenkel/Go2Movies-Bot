@@ -1,8 +1,16 @@
 # YOUR BOT LOGIC/STORAGE/BACKEND FUNCTIONS HERE
 import datetime
+import db_management
 
-class model:
+
+class Model:
     def __init__(self):
+        pass
+
+    def add_user(self, chat_id):
+        pass
+
+    def find_user(self, chat_id):
         pass
 
     def add_movie(self, chat_id, movie):
