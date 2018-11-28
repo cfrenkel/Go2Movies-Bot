@@ -8,8 +8,6 @@ class DBManagement:
         self.db = self.client.get_database(settings.db)
         self.collection = self.db.get_collection(settings.collection)
 
-
-
     def init_user(self, chat_id, status):
         pass
 
@@ -38,6 +36,9 @@ class DBManagement:
         pass
 
     def insert_date(self, chat_id, is_notification=True):
+        pass
+
+    def find_user(self, chat_id):
         pass
 
 
