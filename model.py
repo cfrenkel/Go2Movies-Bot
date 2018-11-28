@@ -9,31 +9,34 @@ def add_user(chat_id):
         DB.DBManagement().insert_user(chat_id)
 
 def add_user(chat_id):
-    if not DB.find_user(chat_id):
-        DB.insert_user(chat_id)
+    if not DB.DBManagement().find_user(chat_id):
+        DB.DBManagement().insert_user(chat_id)
         return True
     return False
+
 
 def update_status(chat_id, status):
     DB.DBManagement().update_status(chat_id, status)
 
-def get_status( chat_id):
+
+def get_status(chat_id):
     return DB.DBManagement().get_status(chat_id)
 
-def add_movie(chat_id, movie_name):
 
 def add_movie(chat_id, movie_name):
     querystring = {"query": movie_name.replace(" ", "+"), "n": 1}
     response = requests.request("GET", secret_settings.url_movieglu_api + "filmLiveSearch/",
                                 headers=secret_settings.headers_movieglu_api, params=querystring)
+
     movie_id = response.json()['films'][0]['film_id']
     movie = get_movie_details(movie_id)
+    movie = movie.json()
     movie_det = {"film_id": movie_id,
                  "movie_name": movie_name,
-                 "genre": movie['genres'][0]['genre_id'],
+                 "genre": movie['genres'][0]['genre_id'] if movie['genres'] else None,
                  "cast": [c['cast_id'] for c in movie["cast"]],
                  "directors": [c['director_id'] for c in movie["directors"]]}
-    DB.DBManagement.insert_movie(chat_id, movie_det)
+    DB.DBManagement().insert_movie(chat_id, movie_det)
 
 
 def get_recommended_movies(lat, lon, date):  # chat_id,
@@ -108,7 +111,7 @@ def choose_movie(chat_id, movie):
 # movie type is list/tuple of all movie info
 
 def get_chosen_movie(chat_id):
-    return DB.get_chosen_movie(chat_id)
+    return DB.DBManagement().get_chosen_movie(chat_id)
 
 
 def delete_movie(chat_id, movie):
@@ -118,6 +121,7 @@ def delete_movie(chat_id, movie):
 
 def delete_all_movies(chat_id):
     DB.DBManagement().delete_all_movies(chat_id)
+
 
 def choose_date(chat_id, date=datetime.datetime.now(), is_notification=True):
     DB.DBManagement().insert_date(chat_id, date, is_notification)

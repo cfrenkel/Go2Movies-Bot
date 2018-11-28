@@ -33,12 +33,10 @@ def start(bot, update):
     # \
     # "\n\nGive me movie you're like to add it to your movies list."
 
-    # custom_keyboard = [[location_keyboard]]
-    # reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
-    # bot.send_message(chat_id=update.message.chat_id, text="Would you mind sharing your location with me?",
-    #                  reply_markup=reply_markup)
+
 
     logger.info(f"> Start chat #{chat_id}")
+
     keyboard = [[InlineKeyboardButton("Add movie", callback_data='1')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
@@ -51,6 +49,13 @@ def respond(bot, update):
     if model.get_status(chat_id) == "add":
         model.add_movie(chat_id, text)
 
+        message = "All right! Press Add to add more movie, or Get movies to find fit movie."
+        keyboard = [[InlineKeyboardButton("Add movie", callback_data='1')],
+                    [InlineKeyboardButton("Get movies", callback_data='2')]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
+
+
     # response = "cool! I'm going to find you a fit movie. wait a moment..."
     # bot.send_message(chat_id=update.message.chat_id, text=response)
     # recommended_movies = model.get_recommended_movies()
@@ -58,31 +63,34 @@ def respond(bot, update):
 
 
 def handle_location(bot, update):
-  chat_id = update.message.chat_id
-  logger.info(f"> location chat #{chat_id}")
+    chat_id = update.message.chat_id
+    logger.info(f"> location chat #{chat_id}")
 
-  lon = update.message['location'].longitude
-  lat = update.message['location'].latitude
-  logger.info(f"& Got location on chat #{chat_id}: {lat!r} ,{lon}")
+    lon = update.message['location'].longitude
+    lat = update.message['location'].latitude
+    logger.info(f"& Got location on chat #{chat_id}: {lat!r} ,{lon}")
 
-  print(lon)
-  reply_markup = telegram.ReplyKeyboardRemove()
-  bot.send_message(chat_id=update.message.chat_id, text=f"haifa is {response:.3f} km away from you.",
-                   reply_markup=reply_markup)
+    reply_markup = telegram.ReplyKeyboardRemove()
+    bot.send_message(chat_id=update.message.chat_id, reply_markup=reply_markup)
 
-  location_keyboard = telegram.KeyboardButton(text="",
-                                              request_location=True)
 
 def button(bot, update):
     query = update.callback_query
     chat_id = query.message.chat_id
     if query.data == "1":
-        model.update_status(chat_id,"add")
-        bot.send_message(chat_id=chat_id, text="no problem!, enter a movie name")
+        model.update_status(chat_id, "add")
+        bot.send_message(chat_id=chat_id, text="No problem! Enter a movie name")
     elif query.data == "2":
-        pass
+        model.update_status(chat_id, "get_movies")
+
+        # location_keyboard = telegram.KeyboardButton(text="send_location", request_location=True)
+        # custom_keyboard = [[location_keyboard]]
+        # reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+        bot.send_message(chat_id=chat_id, text="share your location with us!")
+
     else:
         pass
+
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
@@ -96,4 +104,6 @@ location_handler = MessageHandler(Filters.location, handle_location)
 dispatcher.add_handler(CallbackQueryHandler(button))
 logger.info("Start polling")
 updater.start_polling()
+
+
 

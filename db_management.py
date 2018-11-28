@@ -16,9 +16,10 @@ class DBManagement:
         self.collection.update_one({"chat_id": chat_id}, {"$set": {"status": status}})
 
     def insert_movie(self, chat_id, movie):
-        movie_list = self.collection.find_one({}, {"chat_id":chat_id})["movies_list"]
-        movie_list.append(movie)
-        self.collection.update_one({"chat_id": chat_id}, {"$set": {"movies_list": movie_list}})
+        movies_list = self.collection.find_one({"chat_id": chat_id})["movies_list"]
+        if movie not in movies_list:
+            movies_list.append(movie)
+            self.collection.update_one({"chat_id": chat_id}, {"$set": {"movies_list": movies_list}})
 
     def delete_movie(self, chat_id):
         pass
@@ -38,13 +39,13 @@ class DBManagement:
         return self.collection.find_one({"chat_id": chat_id})['status']
 
     def get_all_movies(self, chat_id):
-        return self.collection.find_one({}, {"chat_id": chat_id})["movies_list"]
+        return self.collection.find_one({"chat_id": chat_id})["movies_list"]
 
     def get_chosen_movie(self, chat_id):
-        return self.collection.find_one({}, {"chat_id": chat_id})["chosen_movie"]
+        return self.collection.find_one({"chat_id": chat_id})["chosen_movie"]
 
     def get_date(self, chat_id):
-        return self.collection.find_one({},{"chat_id":chat_id})["date"]
+        return self.collection.find_one({"chat_id":chat_id})["date"]
 
     def insert_date(self, chat_id, date, is_notification=True):
         self.collection.update_one({'chat_id': chat_id, },
@@ -52,8 +53,8 @@ class DBManagement:
                                     'is_notification': is_notification})
 
     def find_user(self, chat_id):
-        c = self.collection.count({"chat_id":chat_id})
-        if c!=0:
+        c = self.collection.count({"chat_id": chat_id})
+        if c != 0:
             return True
         return False
 
