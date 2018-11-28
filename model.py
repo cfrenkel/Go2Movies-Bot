@@ -54,7 +54,7 @@ class Model:
     def delete_all_movies(self, chat_id):
         DB.delete_all_movies(chat_id)
 
-    def choose_date(self, chat_id, date=datetime.datetime.now(), is_notification = True):
+    def choose_date(self, chat_id, date=datetime.datetime.now(), is_notification=True):
         DB.insert_date(chat_id, date, is_notification)
 
     def get_all_movies(self, chat_id):
