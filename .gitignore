@@ -1,0 +1,6 @@
+secret_settings.py
+.idea
+
+# To keep Udi and all the participants sane during the Hackathon
+Pipfile.lock  # This file should actually BE in the repository
+
