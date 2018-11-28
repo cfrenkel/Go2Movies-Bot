@@ -11,7 +11,26 @@ class model:
     def get_recommended_movies(self, chat_id):
         pass
 
+    def get_recommended_name_movie(self, chosen_movie):
+        pass
+
+    def get_recommended_place_movie(self, chosen_movie):
+        pass
+
+    def get_recommended_time_movie(self, chosen_movie):
+        pass
+
+    def get_recommended_trailer_movie(self, chosen_movie):
+        pass
+
+    def get_recommended_image_movie(self, chosen_movie):
+        pass
+
     def choose_movie(self, chat_id, movie):
+        pass
+    # movie type is list/tuple of all movie info
+
+    def get_chosen_movie(self, chat_id):
         pass
 
     def delete_movie(self, chat_id, movie):
@@ -24,7 +43,7 @@ class model:
     def choose_date(self, chat_id, date=datetime.datetime.now()):
         pass
 
-    def get_chosen_movie(self, chat_id):
+    def get_movie(self, chosen_movie):
         pass
 
     def get_all_movies(self, chat_id):
