@@ -2,12 +2,11 @@ import settings
 import pymongo.mongo_client
 
 
-class db_management:
+class DBManagement:
     def __init__(self):
-        self.db = settings.db
-        self.collection = settings.collection
-
-
+        self.client = pymongo.mongo_client.MongoClient()
+        self.db = self.client.get_database(settings.db)
+        self.collection = self.db.get_collection(settings.collection)
 
     def init_user(self, chat_id, status):
         pass
@@ -37,6 +36,9 @@ class db_management:
         pass
 
     def insert_date(self, chat_id, is_notification=True):
+        pass
+
+    def find_user(self, chat_id):
         pass
 
 
