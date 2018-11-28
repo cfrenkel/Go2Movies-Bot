@@ -1,1 +1,2 @@
 # YOUR NOT-SECRET SETTINGS HERE
+db = ""
