@@ -19,8 +19,24 @@ def update_status(chat_id, status):
     DB.DBManagement().update_status(chat_id, status)
 
 
+def update_lat(chat_id, lat):
+    DB.DBManagement().update_lat(chat_id, lat)
+
+
+def update_lon(chat_id, lon):
+    DB.DBManagement().update_lon(chat_id, lon)
+
+
 def get_status(chat_id):
     return DB.DBManagement().get_status(chat_id)
+
+
+def get_lat(chat_id):
+    return DB.DBManagement().get_lat(chat_id)
+
+
+def get_lon(chat_id):
+    return DB.DBManagement().get_lon(chat_id)
 
 
 def add_movie(chat_id, movie_name):
@@ -39,7 +55,7 @@ def add_movie(chat_id, movie_name):
     DB.DBManagement().insert_movie(chat_id, movie_det)
 
 
-def get_recommended_movies(lat, lon, date):  # chat_id,
+def get_recommended_movies(chat_id, lat, lon, date):  # chat_id,
     cinemas = get_cinemas_nearby(3, lat, lon)
     films = []
     movies = []
@@ -49,33 +65,30 @@ def get_recommended_movies(lat, lon, date):  # chat_id,
 
     for film in films:
         for f in film["films"]:
+            movie_hour = f['showings']['Standard']['times'][0]['start_time']
             movie_det = get_movie_details(f['film_id'])
             movie_det = movie_det.json()
             movie_name = movie_det['film_name']
             trailer = movie_det['trailers']['med'][0]['film_trailer'] if movie_det['trailers'] else None
             image = movie_det['images']['poster']['1']['medium']['film_image'] if movie_det['images'] else None
-            geners = movie_det['genres'][0]['genre_id'] if movie_det['genres'] else None
+            genres = movie_det['genres'][0]['genre_id'] if movie_det['genres'] else None
             movies.append({"cinema": film['cinema'],
                            "movie_name": movie_name,
-                           "gener": geners,
+                           "genre": genres,
                            "cast": [c['cast_id'] for c in movie_det["cast"]],
                            "directors": [c['director_id'] for c in movie_det["directors"]], "trailers": trailer,
-                           "images": image})
+                           "images": image,
+                           "movie_hour":movie_hour})
 
     recommend = []
-    # my_movies = get_all_movies(chat_id)
-    my_movies = [{"film_id": 191861,
-                  "movie_name": "Guardians of the Galaxy Vol. 2",
-                  "gener": 5,
-                  "cast": [13906, 13907, 13050],
-                  "directors": [3549]}]
+    my_movies = get_all_movies(chat_id)
     for my_movie in my_movies:
         for movie in movies:
-            if my_movie['gener'] == movie['gener'] or ( set(my_movie['cast']) ^ set(movie['cast']) or set(
+            if my_movie['genre'] == movie['genre'] or (set(my_movie['cast']) ^ set(movie['cast']) or set(
                     my_movie['directors']) ^ set(movie['directors'])):
                 recommend.append(movie)
 
-    return recommend
+    return recommend[:4]
 
 
 def get_recommended_name_movie(chosen_movie):

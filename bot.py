@@ -42,11 +42,20 @@ def start(bot, update):
     bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
 
 
+def publish_result(movies_list):
+    print(movies_list)
+    # for movie in movies_list:
+    #     m = movie['cinema']
+    #     print(m['cinema_name'], m['address'])
+    #     print(m['movie_name'], m['trailers'], m['images'])
+
 def respond(bot, update):
     chat_id = update.message.chat_id
     text = update.message.text
+    status = model.get_status(chat_id)
+
     logger.info(f"= Got on chat #{chat_id}: {text!r}")
-    if model.get_status(chat_id) == "add":
+    if status == "add":
         model.add_movie(chat_id, text)
 
         message = "All right! Press Add to add more movie, or Get movies to find fit movie."
@@ -55,7 +64,8 @@ def respond(bot, update):
         reply_markup = InlineKeyboardMarkup(keyboard)
         bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
 
-
+    elif status == "get_movies":
+        publish_result(model.get_recommended_movies(chat_id, model.get_lat(chat_id), model.get_lon(chat_id), text))
     # response = "cool! I'm going to find you a fit movie. wait a moment..."
     # bot.send_message(chat_id=update.message.chat_id, text=response)
     # recommended_movies = model.get_recommended_movies()
@@ -70,8 +80,12 @@ def handle_location(bot, update):
     lat = update.message['location'].latitude
     logger.info(f"& Got location on chat #{chat_id}: {lat!r} ,{lon}")
 
-    reply_markup = telegram.ReplyKeyboardRemove()
-    bot.send_message(chat_id=update.message.chat_id, reply_markup=reply_markup)
+    model.update_lon(chat_id, lon)
+    model.update_lat(chat_id, lat)
+    # reply_markup = telegram.ReplyKeyboardRemove()
+    # bot.send_message(chat_id=update.message.chat_id, reply_markup=reply_markup)
+
+    bot.send_message(chat_id=chat_id, text="Insert date in YYYY-MM-DD format.")
 
 
 def button(bot, update):
@@ -82,7 +96,6 @@ def button(bot, update):
         bot.send_message(chat_id=chat_id, text="No problem! Enter a movie name")
     elif query.data == "2":
         model.update_status(chat_id, "get_movies")
-
         # location_keyboard = telegram.KeyboardButton(text="send_location", request_location=True)
         # custom_keyboard = [[location_keyboard]]
         # reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
@@ -98,8 +111,9 @@ dispatcher.add_handler(start_handler)
 echo_handler = MessageHandler(Filters.text, respond)
 dispatcher.add_handler(echo_handler)
 
-dispatcher.add_handler(echo_handler)
 location_handler = MessageHandler(Filters.location, handle_location)
+dispatcher.add_handler(location_handler)
+
 
 dispatcher.add_handler(CallbackQueryHandler(button))
 logger.info("Start polling")

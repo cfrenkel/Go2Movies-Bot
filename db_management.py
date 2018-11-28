@@ -10,10 +10,16 @@ class DBManagement:
         self.collection = self.db.get_collection(settings.collection)
 
     def insert_user(self, chat_id):
-        self.collection.insert_one({"chat_id": chat_id, "status": 'start', "movies_list": [], "date":None, "chosen_movie":None, "is_notification":None})
+        self.collection.insert_one({"chat_id": chat_id, "status": 'start', "movies_list": [], "date":None, "chosen_movie":None, "is_notification":None, "lat":None, "lon":None})
 
     def update_status(self, chat_id, status):
         self.collection.update_one({"chat_id": chat_id}, {"$set": {"status": status}})
+
+    def update_lat(self, chat_id, lat):
+        self.collection.update_one({"chat_id": chat_id}, {"$set": {"lat": lat}})
+
+    def update_lon(self, chat_id, lon):
+        self.collection.update_one({"chat_id": chat_id}, {"$set": {"lon": lon}})
 
     def insert_movie(self, chat_id, movie):
         movies_list = self.collection.find_one({"chat_id": chat_id})["movies_list"]
@@ -45,7 +51,13 @@ class DBManagement:
         return self.collection.find_one({"chat_id": chat_id})["chosen_movie"]
 
     def get_date(self, chat_id):
-        return self.collection.find_one({"chat_id":chat_id})["date"]
+        return self.collection.find_one({"chat_id": chat_id})["date"]
+
+    def get_lat(self, chat_id):
+        return self.collection.find_one({"chat_id": chat_id})["lat"]
+
+    def get_lon(self, chat_id):
+        return self.collection.find_one({"chat_id": chat_id})["lon"]
 
     def insert_date(self, chat_id, date, is_notification=True):
         self.collection.update_one({'chat_id': chat_id, },
