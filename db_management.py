@@ -10,7 +10,7 @@ class DBManagement:
         self.collection = self.db.get_collection(settings.collection)
 
     def insert_user(self, chat_id):
-        self.collection.insert_one({"chat_id": chat_id}, {"status": 'start', "movies_list": [], "date":None, "chosen_movie":None, "is_notification":None})
+        self.collection.insert_one({"chat_id": chat_id, "status": 'start', "movies_list": [], "date":None, "chosen_movie":None, "is_notification":None})
 
     def update_status(self, chat_id, status):
         self.collection.update_one({"chat_id": chat_id}, {"$set": {"status": status}})
@@ -35,7 +35,7 @@ class DBManagement:
                                                        'image': movie['image']}}})
 
     def get_status(self, chat_id):
-        return self.collection.find_one({}, {"chat_id": chat_id})["status"]
+        return self.collection.find_one({"chat_id": chat_id})['status']
 
     def get_all_movies(self, chat_id):
         return self.collection.find_one({}, {"chat_id": chat_id})["movies_list"]
@@ -52,9 +52,11 @@ class DBManagement:
                                     'is_notification': is_notification})
 
     def find_user(self, chat_id):
-        if self.collection.find({}, {"chat_id":chat_id}):
+        c = self.collection.count({"chat_id":chat_id})
+        if c!=0:
             return True
         return False
+
 
 
 
