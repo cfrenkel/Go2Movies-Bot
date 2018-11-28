@@ -2,6 +2,7 @@
 import datetime
 import requests
 import db_management as DB
+import secret_settings
 
 
 class Model:
@@ -28,18 +29,16 @@ class Model:
         pass
 
     def get_recommended_trailer_movie(self, chosen_movie_id):
-        pass
+        querystring = {"film_id": chosen_movie_id}
+        response = requests.request("GET", secret_settings.url_movieglu_api + "trailers/",
+                                    headers=secret_settings.headers_movieglu_api, params=querystring)
+        return response.json()['trailers']['high'][0]['film_trailer']
 
     def get_recommended_image_movie(self, chosen_movie_id):
-        url = "https://api-gate2.movieglu.com/images/"
-
         querystring = {"film_id": chosen_movie_id}
-        headers = {'api-version': "v200", 'Authorization': "Basic T1BHRDpHTGRKT3hQWlVhR20=", 'client': "OPGD",
-                   'x-api-key': "jTg3zUPMu737K3UCf7vCf57Ghrkg6s6x56WN2tHv",
-                   'device-datetime': "2018-11-26T09:32:07.409Z", 'territory': "US", }
-        response = requests.request("GET", url, headers=headers, params=querystring)
-
-        print( response.json()['poster']['1']['medium']['film_image'])
+        response = requests.request("GET", secret_settings.url_movieglu_api + "images/",
+                                    headers=secret_settings.headers_movieglu_api, params=querystring)
+        return response.json()['poster']['1']['medium']['film_image']
 
     def choose_movie(self, chat_id, movie):
         DB.insert_chosen_movie(chat_id, movie)
@@ -69,4 +68,4 @@ class Model:
 
 
 m = Model()
-m.get_recommended_image_movie("227902")
+print(m.get_recommended_trailer_movie("227902"))
