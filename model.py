@@ -13,18 +13,38 @@ class Model:
         if not DB.find_user(chat_id):
             DB.insert_user(chat_id)
 
-    def add_movie(self, chat_id, movie):
-        DB.insert_movie(chat_id, movie)
+    def add_movie(self, chat_id, movie_name):
+        querystring = {"query": movie_name.replace(" ", "+"),"n": 1}
+        response = requests.request("GET", secret_settings.url_movieglu_api + "filmLiveSearch/",
+                                    headers=secret_settings.headers_movieglu_api, params=querystring)
+        movie_id = response.json()['films'][0]['film_id']
+        movie = self.get_film_details(movie_id)
+        movie_det = {"film_id":movie_id, "movie_name":movie_name,
+        "ganer": movie['genres'][0]['genre_id'], "cast": [c['cast_id'] for c in movie["cast"]], "directors": [
+            c['director_id'] for c in movie["directors"]]}
+        DB.DBManagement.insert_movie(chat_id, movie_det)
+
+
+
+
+        #DB.insert_movie(chat_id, movie_name)
 
     def get_recommended_movies(self, chat_id,lat,lon,date):
         cinemas = self.get_cinemas_nearby(5, lat,lon)
         films = []
         movies = []
         for cinema in cinemas:
-            films.append({"cinema_id":cinema['cinema_id'], "film":self.get_cinema_show_times(cinema['cinema_id'], date)})
+            films.append({"cinema_id":cinema['cinema_id'], "films":self.get_cinema_show_times(cinema['cinema_id'], date)})
 
         for film in films:
-            movies.append({"cinema_id":film['cinema_id'], "ganer":film[])
+            for f in film:
+                movie_det = self.get_film_details(f['film_id'])
+                movies.append({"cinema_id":film['cinema_id'], "ganer":movie_det['genres'][0]['genre_id'], "cast":[c['cast_id']for c in movie_det["cast"]],"directors": [c['director_id']for c in movie_det["directors"]]})
+
+        my_movies = self.get_all_movies(chat_id)
+        for my_movie in my_movies:
+            pass
+
 
 
     def get_recommended_name_movie(self, chosen_movie):
@@ -100,5 +120,6 @@ class Model:
 
 
 m = Model()
+m.add_movie("star wars")
 #print(m.get_cinemas_nearby(5, 40.692532, -73.990997))
 #print(m.get_cinema_show_times(7334, str(datetime.datetime.now())[:10]))
