@@ -16,14 +16,22 @@ class Model:
     def add_movie(self, chat_id, movie):
         DB.insert_movie(chat_id, movie)
 
-    def get_recommended_movies(self, chat_id):
-        pass
+    def get_recommended_movies(self, chat_id,lat,lon,date):
+        cinemas = self.get_cinemas_nearby(5, lat,lon)
+        films = []
+        movies = []
+        for cinema in cinemas:
+            films.append({"cinema_id":cinema['cinema_id'], "film":self.get_cinema_show_times(cinema['cinema_id'], date)})
+
+        for film in films:
+            movies.append({"cinema_id":film['cinema_id'], "ganer":film[])
+
 
     def get_recommended_name_movie(self, chosen_movie):
         return chosen_movie
 
     def get_recommended_place_movie(self, chosen_movie):
-        return
+        pass
 
     def get_recommended_time_movie(self, chosen_movie):
         pass
@@ -63,9 +71,34 @@ class Model:
     def get_date(self, chat_id):
         return DB.get_date(chat_id)
 
+    def get_cinemas_nearby(self, n_cinemas, lat, lon):
+        querystring = {"n": n_cinemas}
+        headers = secret_settings.headers_movieglu_api
+        headers['geolocation'] = f"{lat};{lon}"
+        response = requests.request("GET", secret_settings.url_movieglu_api + "cinemasNearby/",
+                                    headers=headers, params=querystring)
+        cinemas = response.json()['cinemas']
+        return cinemas
+
+    def get_cinema_show_times(self, cinema_id, date):
+        querystring = {"cinema_id": cinema_id, "date": date}
+        headers = secret_settings.headers_movieglu_api
+        response = requests.request("GET", secret_settings.url_movieglu_api + "cinemaShowTimest/",
+                                    headers=headers, params=querystring)
+        result = response.json()
+        films = result['films']
+        return films
+
+
+    def get_film_details(self, movie_id):
+        querystring = {"film_id": movie_id}
+        response = requests.request("GET", secret_settings.url_movieglu_api+"filmDetails/", headers=secret_settings.headers_movieglu_api, params=querystring)
+        return response
+
     def notify(self, chat_id, time_before=60):
         pass
 
 
 m = Model()
-print(m.get_recommended_trailer_movie("227902"))
+#print(m.get_cinemas_nearby(5, 40.692532, -73.990997))
+#print(m.get_cinema_show_times(7334, str(datetime.datetime.now())[:10]))
