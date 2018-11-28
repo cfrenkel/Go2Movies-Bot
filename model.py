@@ -12,6 +12,14 @@ class Model:
     def add_user(self, chat_id):
         if not DB.find_user(chat_id):
             DB.insert_user(chat_id)
+            return True
+        return False
+
+    def get_status(self, chat_id):
+        return DB.get_status(chat_id)
+
+    def update_status(self, chat_id, status):
+        DB.update_status(chat_id, status)
 
     def add_movie(self, chat_id, movie):
         DB.insert_movie(chat_id, movie)

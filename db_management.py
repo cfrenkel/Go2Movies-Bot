@@ -9,14 +9,14 @@ class DBManagement:
         self.db = self.client.get_database(settings.db)
         self.collection = self.db.get_collection(settings.collection)
 
-    def insert_user(self, chat_id, status):
-        self.collection.insert_one({"chat_id":chat_id},{"status":status,"movies_list":[], "date":None, "chosen_movie":None, "is_notification":None})
+    def insert_user(self, chat_id):
+        self.collection.insert_one({"chat_id": chat_id}, {"status": 'start', "movies_list": [], "date":None, "chosen_movie":None, "is_notification":None})
 
-    def update_status(self, chat_id,status):
-        self.collection.update_one({"chat_id":chat_id},{"$set":{"status":status}})
+    def update_status(self, chat_id, status):
+        self.collection.update_one({"chat_id": chat_id}, {"$set": {"status": status}})
 
     def insert_movie(self, chat_id, movie):
-        movie_list = self.collection.find_one({},{"chat_id":chat_id})["movies_list"]
+        movie_list = self.collection.find_one({}, {"chat_id":chat_id})["movies_list"]
         movie_list.append(movie)
         self.collection.update_one({"chat_id": chat_id}, {"$set": {"movies_list": movie_list}})
 
@@ -34,6 +34,9 @@ class DBManagement:
                                                        'trailer': movie['trailer'],
                                                        'image': movie['image']}}})
 
+    def get_status(self, chat_id):
+        return self.collection.find_one({}, {"chat_id": chat_id})["status"]
+
     def get_all_movies(self, chat_id):
         return self.collection.find_one({}, {"chat_id": chat_id})["movies_list"]
 
@@ -49,7 +52,7 @@ class DBManagement:
                                     'is_notification': is_notification})
 
     def find_user(self, chat_id):
-        if self.collection.find({},{"chat_id":chat_id}):
+        if self.collection.find({}, {"chat_id":chat_id}):
             return True
         return False
 
