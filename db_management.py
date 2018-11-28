@@ -46,6 +46,9 @@ class DBManagement:
                                    {'date': date,
                                     'is_notification': is_notification})
 
+    def find_user(self, chat_id):
+        pass
+
 
 
 
