@@ -17,7 +17,6 @@ class DBManagement:
     def update_movie(self, chat_id):
         self.collection.update_one({"chat_id": chat_id}, {"$set": {"movie": None}})
 
-
     def update_lat(self, chat_id, lat):
         self.collection.update_one({"chat_id": chat_id}, {"$set": {"lat": lat}})
 
@@ -29,9 +28,6 @@ class DBManagement:
         if movie not in movies_list:
             movies_list.append(movie)
             self.collection.update_one({"chat_id": chat_id}, {"$set": {"movies_list": movies_list}})
-
-    def delete_movie(self, chat_id):
-        pass
 
     def delete_all_movies(self, chat_id):
         self.collection.update_one({"chat_id": chat_id}, {"$set": {"movies_list": []}})

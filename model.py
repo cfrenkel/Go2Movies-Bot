@@ -88,18 +88,6 @@ def get_recommended_movies(chat_id, lat, lon, date):  # chat_id,
     return recommend[:3]
 
 
-def get_recommended_name_movie(chosen_movie):
-    return chosen_movie
-
-
-def get_recommended_place_movie(chosen_movie):
-    pass
-
-
-def get_recommended_time_movie(chosen_movie):
-    pass
-
-
 def get_recommended_trailer_movie(chosen_movie_id):
     querystring = {"film_id": chosen_movie_id}
     response = requests.request("GET", secret_settings.url_movieglu_api + "trailers/",
