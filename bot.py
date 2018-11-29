@@ -127,8 +127,10 @@ def button(bot, update):
 
     elif query.data == "3":
         m = db_management.DBManagementHelper().get_movies_list(chat_id)
-        print(query.message)
-        publish_result(m, bot, chat_id)
+        if db_management.DBManagementHelper().get_index(chat_id) < 3:
+            publish_result(m, bot, chat_id)
+        else:
+            bot.send_message(chat_id=chat_id, text="Sorry, no more recommended movies :(")
     elif query.data == "100":
         model.choose_movie(chat_id, db_management.DBManagementHelper().get_movies_list(chat_id)[0])
         bot.send_message(chat_id=chat_id, text="Great choice!\nYou will be notified 1 hour before.")
@@ -141,6 +143,7 @@ def button(bot, update):
         model.choose_movie(chat_id, db_management.DBManagementHelper().get_movies_list(chat_id)[2])
         bot.send_message(chat_id=chat_id, text="Great choice!\nYou will be notified 1 hour before.")
         jobs.run_once(notify, 5, context=chat_id)
+
 
 
 def invite(bot, update):
