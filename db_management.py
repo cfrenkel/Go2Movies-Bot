@@ -50,7 +50,7 @@ class DBManagement:
     #     return self.collection.find_one()
 
     def get_chosen_movie(self, chat_id):
-        return self.collection.find_one({"chat_id": chat_id})["chosen_movie"]
+        return self.collection.find_one({"chat_id": chat_id})["movie"]
 
     def get_date(self, chat_id):
         return self.collection.find_one({"chat_id": chat_id})["date"]

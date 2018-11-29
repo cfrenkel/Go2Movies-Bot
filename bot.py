@@ -64,15 +64,16 @@ def publish_result(movies_list, bot, chat_id):
               f"Address: {m['address']}\n"
 
     if index == 2:
-        keyboard = [[InlineKeyboardButton("I want to go watch this one!", callback_data='10' + str(index))]]
+        keyboard = [[InlineKeyboardButton("I want to watch it!", callback_data='10' + str(index))]]
     else:
-        keyboard = [[InlineKeyboardButton("I want to go watch this one!", callback_data='10' + str(index)),
-                     InlineKeyboardButton("Show me more movie...", callback_data='3')]]
+        keyboard = [[InlineKeyboardButton("I want to watch it!", callback_data='10' + str(index)),
+                     InlineKeyboardButton("Show me more one", callback_data='3')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     bot.send_message(chat_id=chat_id, text=message)
     bot.send_video(chat_id=chat_id, text=message, video=movie['trailers'], supports_streaming=True,
                    reply_markup=reply_markup)
     db_management.DBManagementHelper().update_index(chat_id, index + 1)
+
 
 def respond(bot, update):
     chat_id = update.message.chat_id
@@ -122,7 +123,7 @@ def button(bot, update):
         bot.send_message(chat_id=chat_id, text="Ok, Enter a movie name.")
     elif query.data == "2":
         model.update_status(chat_id, "get_movies")
-        bot.send_message(chat_id=chat_id, text="Share your location with us!")
+        bot.send_message(chat_id=chat_id, text="Share your location with us.")
 
     elif query.data == "3":
         m = db_management.DBManagementHelper().get_movies_list(chat_id)
@@ -130,27 +131,28 @@ def button(bot, update):
         publish_result(m, bot, chat_id)
     elif query.data == "100":
         model.choose_movie(chat_id, db_management.DBManagementHelper().get_movies_list(chat_id)[0])
-        bot.send_message(chat_id=chat_id, text="Great choice!")
-        jobs.run_once(notify, 60)
+        bot.send_message(chat_id=chat_id, text="Great choice!\nYou will be notified 1 hour before.")
+        jobs.run_once(notify, 5, context=chat_id)
     elif query.data == "101":
         model.choose_movie(chat_id, db_management.DBManagementHelper().get_movies_list(chat_id)[1])
-        bot.send_message(chat_id=chat_id, text="Great choice!")
-        jobs.run_once(notify, 60)
+        bot.send_message(chat_id=chat_id, text="Great choice!\nYou will be notified 1 hour before.")
+        jobs.run_once(notify, 5, context=chat_id)
     elif query.data == "102":
         model.choose_movie(chat_id, db_management.DBManagementHelper().get_movies_list(chat_id)[2])
-        bot.send_message(chat_id=chat_id, text="Great choice!")
-        jobs.run_once(notify, 60)
+        bot.send_message(chat_id=chat_id, text="Great choice!\nYou will be notified 1 hour before.")
+        jobs.run_once(notify, 5, context=chat_id)
 
 
 def invite(bot, update):
-    if model.get_chosen_movie(update.message.chat_id):
+    if model.get_chosen_movie(update.message.chat_id) is not None:
         bot.send_message(chat_id=update.message.chat_id,
-                         text=f'send to your friend :)\nhttps://telegram.me/movie2go_bot?start={chat_id}"')
+                         text=f'send the link to your friend :)')
+        bot.send_message(chat_id=update.message.chat_id,
+                         text=f'https://telegram.me/movie2go')
 
 
-def notify(bot,update, job):
-    bot.send_message(chat_id=update.message.chat_id,
-                    text="your movie going to start!!")
+def notify(bot, job):
+    bot.send_animation(chat_id=job.context, animation="https://media1.tenor.com/images/18f2d9e614832fa816189ee96611a099/tenor.gif")
 
 
 start_handler = CommandHandler('start', start)
@@ -159,7 +161,7 @@ dispatcher.add_handler(start_handler)
 help_handler = CommandHandler('help', help)
 dispatcher.add_handler(help_handler)
 
-invite_handler = CommandHandler('invite', start)
+invite_handler = CommandHandler('invite', invite)
 dispatcher.add_handler(invite_handler)
 
 echo_handler = MessageHandler(Filters.text, respond)
