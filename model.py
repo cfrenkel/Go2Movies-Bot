@@ -4,9 +4,6 @@ import requests
 import db_management as DB
 import secret_settings
 
-def add_user(chat_id):
-    if not DB.DBManagement().find_user(chat_id):
-        DB.DBManagement().insert_user(chat_id)
 
 def add_user(chat_id):
     if not DB.DBManagement().find_user(chat_id):

@@ -27,6 +27,8 @@ def start(bot, update):
     # return
 
     chat_id = update.message.chat_id
+    db_management.DBManagementHelper().update_index(chat_id, 0)
+    db_management.DBManagement().update_movie(chat_id)
     exist_user = ""
     if not model.add_user(chat_id):
         model.update_status(chat_id, 'start')
@@ -41,12 +43,14 @@ def start(bot, update):
 
     logger.info(f"> Start chat #{chat_id}")
 
-    keyboard = [[InlineKeyboardButton("Add movie", callback_data='1')]]
+    keyboard = [[InlineKeyboardButton("Add movie", callback_data='1')]] if not exist_user else \
+        [[InlineKeyboardButton("Add movie", callback_data='1'), InlineKeyboardButton("Get movies", callback_data='2')]]
+
     reply_markup = InlineKeyboardMarkup(keyboard)
     bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
 
 
-def publish_result(movies_list, bot, update):
+def publish_result(movies_list, bot, chat_id):
     # movies_list = [{'cinema': {'cinema_id': 42687, 'cinema_name': 'AMC Classic Hays 8', 'address': '2918 Vine',
     #                            'address2': '', 'city': 'Hays', 'county': 'Ellis', 'postcode': 67601, 'lat': 38.889462,
     #                            'lng': -99.317528, 'distance': 35.51643481413,
@@ -82,9 +86,7 @@ def publish_result(movies_list, bot, update):
     #                    'trailers': 'https://trailer.movieglu.com/197406_med_V2.mp4',
     #                    'images': 'https://image.movieglu.com/197406/197406h1.jpg', 'movie_hour': '19:15'}]
     # message = ""
-    print(movies_list)
-
-    index = db_management.DBManagementHelper().get_index(update.message.chat_id)
+    index = db_management.DBManagementHelper().get_index(chat_id)
     movie = movies_list[index]
     m = movie['cinema']
     message = f"Movie name: {movie['movie_name']}\n" \
@@ -96,13 +98,14 @@ def publish_result(movies_list, bot, update):
     if index == 2:
         keyboard = [[InlineKeyboardButton("I want to go! :)", callback_data='10' + str(index))]]
     else:
-        keyboard = [[InlineKeyboardButton("I want to go! :)", callback_data='10' + str(index))],
-                    [InlineKeyboardButton("show me more movies :)", callback_data='3')]]
+        keyboard = [[InlineKeyboardButton("I want to go! :)", callback_data='10' + str(index)),
+                     InlineKeyboardButton("show me more movies :)", callback_data='3')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    bot.send_message(chat_id=update.message.chat_id, text=message)
-    bot.send_video(chat_id=update.message.chat_id, text=message, video=movie['trailers'], supports_streaming=True,
+    bot.send_message(chat_id=chat_id, text=message)
+    bot.send_video(chat_id=chat_id, text=message, video=movie['trailers'], supports_streaming=True,
                    reply_markup=reply_markup)
-    db_management.DBManagementHelper().update_index(update.message.chat_id, index+1)
+    db_management.DBManagementHelper().update_index(chat_id, index + 1)
+
 
 # print(model.get_movies_example())
 
@@ -114,17 +117,19 @@ def respond(bot, update):
 
     logger.info(f"= Got on chat #{chat_id}: {text!r}")
     if status == "add":
-        model.add_movie(chat_id, text)
+        # here
+        # model.add_movie(chat_id, text)
 
         message = "All right! Press Add to add more movie, or Get movies to find fit movie."
-        keyboard = [[InlineKeyboardButton("Add movie", callback_data='1')],
-                    [InlineKeyboardButton("Get movies", callback_data='2')]]
+        keyboard = [[InlineKeyboardButton("Add movie", callback_data='1'),
+                     InlineKeyboardButton("Get movies", callback_data='2')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
 
     elif status == "get_movies":
-        db_management.DBManagementHelper().insert_movie_list(chat_id,model.get_recommended_movies(chat_id, model.get_lat(chat_id),model.get_lon(chat_id), text))
-        publish_result(db_management.DBManagementHelper().get_movies_list(chat_id), bot, update)
+        # here
+        # db_management.DBManagementHelper().insert_movie_list(chat_id,model.get_recommended_movies(chat_id, model.get_lat(chat_id),model.get_lon(chat_id), text))
+        publish_result(db_management.DBManagementHelper().get_movies_list(chat_id), bot, chat_id)
 
     # response = "cool! I'm going to find you a fit movie. wait a moment..."
     # bot.send_message(chat_id=update.message.chat_id, text=response)
@@ -162,13 +167,18 @@ def button(bot, update):
         bot.send_message(chat_id=chat_id, text="share your location with us!")
 
     elif query.data == "3":
-        publish_result(db_management.DBManagementHelper().get_movies_list(chat_id), bot, update)
+        m = db_management.DBManagementHelper().get_movies_list(chat_id)
+        print(query.message)
+        publish_result(m, bot, chat_id)
     elif query.data == "100":
-        model.choose_movie(chat_id,db_management.DBManagementHelper().get_movies_list(chat_id)[0])
+        model.choose_movie(chat_id, db_management.DBManagementHelper().get_movies_list(chat_id)[0])
+        bot.send_message(chat_id=chat_id, text="Great choice!")
     elif query.data == "101":
-        model.choose_movie(chat_id,db_management.DBManagementHelper().get_movies_list(chat_id)[1])
+        model.choose_movie(chat_id, db_management.DBManagementHelper().get_movies_list(chat_id)[1])
+        bot.send_message(chat_id=chat_id, text="Great choice!")
     elif query.data == "102":
-        model.choose_movie(chat_id,db_management.DBManagementHelper().get_movies_list(chat_id)[2])
+        model.choose_movie(chat_id, db_management.DBManagementHelper().get_movies_list(chat_id)[2])
+        bot.send_message(chat_id=chat_id, text="Great choice!")
     else:
         pass
 

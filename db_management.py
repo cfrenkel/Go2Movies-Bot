@@ -14,6 +14,10 @@ class DBManagement:
     def update_status(self, chat_id, status):
         self.collection.update_one({"chat_id": chat_id}, {"$set": {"status": status}})
 
+    def update_movie(self, chat_id):
+        self.collection.update_one({"chat_id": chat_id}, {"$set": {"movie": None}})
+
+
     def update_lat(self, chat_id, lat):
         self.collection.update_one({"chat_id": chat_id}, {"$set": {"lat": lat}})
 
@@ -34,11 +38,7 @@ class DBManagement:
 
     def insert_chosen_movie(self, chat_id, movie):
         self.collection.update_one({'chat_id': chat_id, },
-                                   {"$set": {"movie": {'name': movie['name'],
-                                                       'place': movie['place'],
-                                                       'time': movie['time'],
-                                                       'trailer': movie['trailer'],
-                                                       'image': movie['image']}}})
+                                   {"$set": {"movie": movie}})
 
     def get_status(self, chat_id):
         return self.collection.find_one({"chat_id": chat_id})['status']
