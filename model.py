@@ -88,7 +88,7 @@ def get_recommended_movies(chat_id, lat, lon, date):  # chat_id,
                     my_movie['directors']) ^ set(movie['directors'])):
                 recommend.append(movie)
 
-    return recommend[:4]
+    return recommend[:3]
 
 
 def get_recommended_name_movie(chosen_movie):
@@ -171,11 +171,15 @@ def get_cinema_show_times(cinema_id, date):
     return films
 
 
-def get_movie_details( movie_id):
+def get_movie_details(movie_id):
     querystring = {"film_id": movie_id}
     response = requests.request("GET", secret_settings.url_movieglu_api + "filmDetails/",
                                 headers=secret_settings.headers_movieglu_api, params=querystring)
     return response
+
+
+# def get_movies_example():
+#     return DB.DBManagement().get_movies_example()
 
 
 def notify(chat_id, time_before=60):

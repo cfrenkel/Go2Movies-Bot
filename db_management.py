@@ -1,7 +1,6 @@
 import settings
 import pymongo.mongo_client
 
-
 class DBManagement:
 
     def __init__(self):
@@ -47,6 +46,9 @@ class DBManagement:
     def get_all_movies(self, chat_id):
         return self.collection.find_one({"chat_id": chat_id})["movies_list"]
 
+    # def get_movies_example(self):
+    #     return self.collection.find_one()
+
     def get_chosen_movie(self, chat_id):
         return self.collection.find_one({"chat_id": chat_id})["chosen_movie"]
 
@@ -71,7 +73,23 @@ class DBManagement:
         return False
 
 
+class DBManagementHelper:
 
+    def __init__(self):
+        self.client = pymongo.mongo_client.MongoClient()
+        self.db = self.client.get_database(settings.db)
+        self.collection = self.db.get_collection("recommended movies")
 
+    def insert_movie_list(self, chat_id, movie_list):
+        self.collection.insert_one({"chat_id": chat_id,"movies_list": movie_list, "index": 0})
+
+    def update_index(self, chat_id, index):
+        self.collection.update_one({"chat_id": chat_id}, {"$set": {"index": index}})
+
+    def get_index(self, chat_id):
+        return self.collection.find_one({"chat_id": chat_id})["index"]
+
+    def get_movies_list(self, chat_id):
+        return self.collection.find_one({"chat_id": chat_id})["movies_list"]
 
 
