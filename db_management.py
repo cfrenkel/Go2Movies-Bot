@@ -81,7 +81,7 @@ class DBManagementHelper:
         self.collection = self.db.get_collection("recommended movies")
 
     def insert_movie_list(self, chat_id, movie_list):
-        self.collection.insert_one({"chat_id": chat_id,"movies_list": movie_list, "index": 0})
+        self.collection.replace_one({"chat_id": chat_id},{"movies_list": movie_list, "index": 0}, upsert=True)
 
     def update_index(self, chat_id, index):
         self.collection.update_one({"chat_id": chat_id}, {"$set": {"index": index}})

@@ -1,23 +1,28 @@
-# {YOUR BOT NAME HERE}
-{ONE LINE BOT DESCRIPTION HERE} <https://t.me/{BOT_ID}>
+# Go2Movie Bot
+Get examples of favorite movies, and find more movies that you may like and being shown today in the cinema.
+ <https://t.me/go2movie_bot>
 
-* {Participant 1 Name}
-* {Participant 2 Name}
-* {Participant 3 Name}
-
-{OPTIONAL: MORE PROJECT INFO}
+* Tali Badichi
+* Ruhami Bichman
+* Chani Frenkel
 
 ## Screenshots
 
-![SCREESHOT DECSRIPTION](screenshots/shopping-list-bot-1.png)
+![SCREESHOT DECSRIPTION](screenshots/bot_in_phone.png)
 
 ## How to Run This Bot
+* start: add new movies until get recommended movies requests  
+* get recommended movies:
+* share location with the telegram bot
+* enter the date
+* get the recommended movie include cinema information,trailer and more
+* show more or choose the movie
+* Movie Time Notification!
 
 ### Prerequisites
 * Python 3.7
 * pipenv
 * MongoDB
-* {ADD MORE DEPENDENCIES HERE}
 
 ### Setup
 * Clone this repo from github
@@ -37,5 +42,5 @@ To run the bot use:
 ## Credits and References
 * [Telegram Docs](https://core.telegram.org/bots)
 * [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)
-* {ADD MORE REFERENCES HERE}
+* [Movieglu API](https://developer.movieglu.com/)
 
