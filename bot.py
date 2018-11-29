@@ -2,6 +2,7 @@ import secret_settings
 import model
 import logging
 import db_management
+import datetime
 
 import settings
 import pymongo.mongo_client
@@ -20,11 +21,9 @@ logger = logging.getLogger(__name__)
 
 updater = Updater(token=secret_settings.BOT_TOKEN)
 dispatcher = updater.dispatcher
-
+jobs = updater.job_queue
 
 def start(bot, update):
-    # publish_result(None, bot, update)
-    # return
 
     chat_id = update.message.chat_id
     db_management.DBManagementHelper().update_index(chat_id, 0)
@@ -106,10 +105,6 @@ def publish_result(movies_list, bot, chat_id):
                    reply_markup=reply_markup)
     db_management.DBManagementHelper().update_index(chat_id, index + 1)
 
-
-# print(model.get_movies_example())
-
-
 def respond(bot, update):
     chat_id = update.message.chat_id
     text = update.message.text
@@ -136,7 +131,6 @@ def respond(bot, update):
     # recommended_movies = model.get_recommended_movies()
     # bot.send_message(chat_id=update.message.chat_id, text=recommended_movies)
 
-
 def handle_location(bot, update):
     chat_id = update.message.chat_id
     logger.info(f"> location chat #{chat_id}")
@@ -149,9 +143,7 @@ def handle_location(bot, update):
     model.update_lat(chat_id, lat)
     # reply_markup = telegram.ReplyKeyboardRemove()
     # bot.send_message(chat_id=update.message.chat_id, reply_markup=reply_markup)
-
     bot.send_message(chat_id=chat_id, text="Insert date in YYYY-MM-DD format.")
-
 
 def button(bot, update):
     query = update.callback_query
@@ -173,18 +165,33 @@ def button(bot, update):
     elif query.data == "100":
         model.choose_movie(chat_id, db_management.DBManagementHelper().get_movies_list(chat_id)[0])
         bot.send_message(chat_id=chat_id, text="Great choice!")
+        jobs.run_once(notify, 60)
     elif query.data == "101":
         model.choose_movie(chat_id, db_management.DBManagementHelper().get_movies_list(chat_id)[1])
         bot.send_message(chat_id=chat_id, text="Great choice!")
+        jobs.run_once(notify, 60)
     elif query.data == "102":
         model.choose_movie(chat_id, db_management.DBManagementHelper().get_movies_list(chat_id)[2])
         bot.send_message(chat_id=chat_id, text="Great choice!")
-    else:
-        pass
+        jobs.run_once(notify, 60)
+
+
+def invite(bot, update):
+    if model.get_chosen_movie(update.message.chat_id):
+        bot.send_message(chat_id=update.message.chat_id,
+                         text=f'send to your friend :)\nhttps://telegram.me/movie2go_bot?start={chat_id}"')
+
+
+def notify(bot,update, job):
+    bot.send_message(chat_id=update.message.chat_id,
+                    text="your movie going to start!!")
 
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
+
+invite_handler = CommandHandler('invite', start)
+dispatcher.add_handler(invite_handler)
 
 echo_handler = MessageHandler(Filters.text, respond)
 dispatcher.add_handler(echo_handler)
@@ -195,3 +202,4 @@ dispatcher.add_handler(location_handler)
 dispatcher.add_handler(CallbackQueryHandler(button))
 logger.info("Start polling")
 updater.start_polling()
+
