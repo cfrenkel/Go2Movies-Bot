@@ -35,57 +35,27 @@ def start(bot, update):
         exist_user = "back"
 
     message = f"Welcome {exist_user} to Go2Movie bot!\n" \
-              "I'll give you some movies you may like, " \
-              "that are being shown today in the cinema."
-
-    # \
-    # "\n\nGive me movie you're like to add it to your movies list."
+              "Give me an example of a movie you like and I'll find you a movie you'll like."
 
     logger.info(f"> Start chat #{chat_id}")
 
     keyboard = [[InlineKeyboardButton("Add movie", callback_data='1')]] if not exist_user else \
-        [[InlineKeyboardButton("Add movie", callback_data='1'), InlineKeyboardButton("Get movies", callback_data='2')]]
+        [[InlineKeyboardButton("Add movie", callback_data='1'),
+          InlineKeyboardButton("Get recommendations", callback_data='2')]]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
 
 
+def help(bot, update):
+    chat_id = update.message.chat_id
+    message = "*Bot options:*\n\nI can do some searching for you." \
+              " If you'll give a movie you liked I'll find some good movies playing today at your area." \
+              "\n\n/start: add a movie to get recommended movies.\n"
+    bot.send_message(chat_id=chat_id, text=message, parse_mode='Markdown')
+
+
 def publish_result(movies_list, bot, chat_id):
-    # movies_list = [{'cinema': {'cinema_id': 42687, 'cinema_name': 'AMC Classic Hays 8', 'address': '2918 Vine',
-    #                            'address2': '', 'city': 'Hays', 'county': 'Ellis', 'postcode': 67601, 'lat': 38.889462,
-    #                            'lng': -99.317528, 'distance': 35.51643481413,
-    #                            'logo_url': 'https://assets.movieglu.com/chain_logos/us/UK-124-sq.jpg'},
-    #                 'movie_name': 'Ralph Breaks the Internet', 'genre': 11, 'cast': [1006, 3756, 3757, 1322, 2195],
-    #                 'directors': [899, 900], 'trailers': 'https://trailer.movieglu.com/164750_med_V2.mp4',
-    #                 'images': 'https://image.movieglu.com/164750/164750h1.jpg', 'movie_hour': '16:15'}, {
-    #                    'cinema': {'cinema_id': 42687, 'cinema_name': 'AMC Classic Hays 8', 'address': '2918 Vine',
-    #                               'address2': '', 'city': 'Hays', 'county': 'Ellis', 'postcode': 67601,
-    #                               'lat': 38.889462,
-    #                               'lng': -99.317528, 'distance': 35.51643481413,
-    #                               'logo_url': 'https://assets.movieglu.com/chain_logos/us/UK-124-sq.jpg'},
-    #                    'movie_name': "Dr. Seuss' The Grinch", 'genre': 11,
-    #                    'cast': [1495, 9822, 14097, 14098, 690, 14099],
-    #                    'directors': [347, 348], 'trailers': 'https://trailer.movieglu.com/180055_med.mp4',
-    #                    'images': 'https://image.movieglu.com/180055/180055h1.jpg', 'movie_hour': '16:30'}, {
-    #                    'cinema': {'cinema_id': 42687, 'cinema_name': 'AMC Classic Hays 8', 'address': '2918 Vine',
-    #                               'address2': '', 'city': 'Hays', 'county': 'Ellis', 'postcode': 67601,
-    #                               'lat': 38.889462,
-    #                               'lng': -99.317528, 'distance': 35.51643481413,
-    #                               'logo_url': 'https://assets.movieglu.com/chain_logos/us/UK-124-sq.jpg'},
-    #                    'movie_name': 'Creed II', 'genre': 7,
-    #                    'cast': [255, 624, 275, 1153, 1154, 1155, 1156, 1157, 1158],
-    #                    'directors': [263], 'trailers': 'https://trailer.movieglu.com/261090_med.mp4',
-    #                    'images': 'https://image.movieglu.com/261090/261090h1.jpg', 'movie_hour': '16:20'}, {
-    #                    'cinema': {'cinema_id': 42687, 'cinema_name': 'AMC Classic Hays 8', 'address': '2918 Vine',
-    #                               'address2': '', 'city': 'Hays', 'county': 'Ellis', 'postcode': 67601,
-    #                               'lat': 38.889462,
-    #                               'lng': -99.317528, 'distance': 35.51643481413,
-    #                               'logo_url': 'https://assets.movieglu.com/chain_logos/us/UK-124-sq.jpg'},
-    #                    'movie_name': 'Fantastic Beasts: The Crimes of Grindelwald', 'genre': 7,
-    #                    'cast': [1532, 1678, 1679, 1680, 1681, 1682, 1057], 'directors': [390],
-    #                    'trailers': 'https://trailer.movieglu.com/197406_med_V2.mp4',
-    #                    'images': 'https://image.movieglu.com/197406/197406h1.jpg', 'movie_hour': '19:15'}]
-    # message = ""
     index = db_management.DBManagementHelper().get_index(chat_id)
     movie = movies_list[index]
     m = movie['cinema']
@@ -93,13 +63,12 @@ def publish_result(movies_list, bot, chat_id):
               f"Hour: {movie['movie_hour']}\n" \
               f"Cinema: {m['cinema_name']}\n" \
               f"Address: {m['address']}\n"
-    # print(movie['trailers'], m['images'])
-    # bot.send_message(chat_id=update.message.chat_id, text=message)
+
     if index == 2:
-        keyboard = [[InlineKeyboardButton("I want to go! :)", callback_data='10' + str(index))]]
+        keyboard = [[InlineKeyboardButton("I want to go watch this one!", callback_data='10' + str(index))]]
     else:
-        keyboard = [[InlineKeyboardButton("I want to go! :)", callback_data='10' + str(index)),
-                     InlineKeyboardButton("show me more movies :)", callback_data='3')]]
+        keyboard = [[InlineKeyboardButton("I want to go watch this one!", callback_data='10' + str(index)),
+                     InlineKeyboardButton("Show me more movies...", callback_data='3')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     bot.send_message(chat_id=chat_id, text=message)
     bot.send_video(chat_id=chat_id, text=message, video=movie['trailers'], supports_streaming=True,
@@ -117,24 +86,21 @@ def respond(bot, update):
 
     logger.info(f"= Got on chat #{chat_id}: {text!r}")
     if status == "add":
-        # here
+        # ORIGINAL CODE HERE:
         # model.add_movie(chat_id, text)
 
-        message = "All right! Press Add to add more movie, or Get movies to find fit movie."
+        message = "All right! Press Add movie to add more movie, or Get recommendations to find movie you'll like."
         keyboard = [[InlineKeyboardButton("Add movie", callback_data='1'),
-                     InlineKeyboardButton("Get movies", callback_data='2')]]
+                     InlineKeyboardButton("Get recommendations", callback_data='2')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
 
     elif status == "get_movies":
-        # here
-        # db_management.DBManagementHelper().insert_movie_list(chat_id,model.get_recommended_movies(chat_id, model.get_lat(chat_id),model.get_lon(chat_id), text))
-        publish_result(db_management.DBManagementHelper().get_movies_list(chat_id), bot, chat_id)
+        # ORIGINAL CODE HERE:
+        # db_management.DBManagementHelper().insert_movie_list(chat_id, model.get_recommended_movies
+        # (chat_id, model.get_lat(chat_id), model.get_lon(chat_id), text))
 
-    # response = "cool! I'm going to find you a fit movie. wait a moment..."
-    # bot.send_message(chat_id=update.message.chat_id, text=response)
-    # recommended_movies = model.get_recommended_movies()
-    # bot.send_message(chat_id=update.message.chat_id, text=recommended_movies)
+        publish_result(db_management.DBManagementHelper().get_movies_list(chat_id), bot, chat_id)
 
 
 def handle_location(bot, update):
@@ -158,13 +124,10 @@ def button(bot, update):
     chat_id = query.message.chat_id
     if query.data == "1":
         model.update_status(chat_id, "add")
-        bot.send_message(chat_id=chat_id, text="No problem! Enter a movie name")
+        bot.send_message(chat_id=chat_id, text="Ok, Enter a movie name.")
     elif query.data == "2":
         model.update_status(chat_id, "get_movies")
-        # location_keyboard = telegram.KeyboardButton(text="send_location", request_location=True)
-        # custom_keyboard = [[location_keyboard]]
-        # reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
-        bot.send_message(chat_id=chat_id, text="share your location with us!")
+        bot.send_message(chat_id=chat_id, text="Share your location with us!")
 
     elif query.data == "3":
         m = db_management.DBManagementHelper().get_movies_list(chat_id)
@@ -185,6 +148,9 @@ def button(bot, update):
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
+
+help_handler = CommandHandler('help', help)
+dispatcher.add_handler(help_handler)
 
 echo_handler = MessageHandler(Filters.text, respond)
 dispatcher.add_handler(echo_handler)
